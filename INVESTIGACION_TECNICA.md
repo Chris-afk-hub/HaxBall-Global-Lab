@@ -89,8 +89,9 @@ Comparar tres opciones:
 - [x] Promedios, gráfico, historial y exportación CSV/JSON.
 - [x] Investigación inicial de la arquitectura de HaxBall y node-haxball.
 - [ ] Recolectar mediciones reales en Brasil y Estados Unidos.
-- [ ] Revisar ejemplos concretos de node-haxball y seleccionar un prototipo.
-- [ ] Implementar y probar un experimento de predicción/interpolación.
+- [x] Crear el primer prototipo visual local de latencia: `experiments/prototipo-latencia.html` (simulación conceptual; no se conecta a HaxBall ni reduce ping real).
+- [ ] Revisar ejemplos concretos de node-haxball y seleccionar un prototipo ejecutable.
+- [ ] Implementar y probar un experimento real de predicción/interpolación en una sala aislada.
 
 ## Fuentes
 
