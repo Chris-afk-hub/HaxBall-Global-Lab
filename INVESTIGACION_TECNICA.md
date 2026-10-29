@@ -37,6 +37,17 @@ Para que dos regiones colaboren en una sola simulación, haría falta un protoco
 - **Interpolación/extrapolación visual:** puede suavizar movimientos remotos; no reduce el ping real y puede añadir retraso visual.
 - **Dos hosts regionales sincronizados:** queda como experimento avanzado, después de validar una simulación determinista y un protocolo de autoridad.
 
+## Mediciones recibidas
+
+### Línea base inicial — 29 de octubre de 2026
+
+- Trayecto reportado: Argentina → Estados Unidos.
+- Ping reportado: **202–212 ms**.
+- Trayecto inverso (Estados Unidos → Argentina): todavía no medido; podría ser parecido, pero no debe darse por confirmado.
+- Datos pendientes: ubicación exacta de la sala/host, ping de cada participante, conexión Wi-Fi o Ethernet, hora y si hubo tirones o pérdida de conexión.
+
+Esta es una primera referencia comunicada por un participante, no una prueba controlada ni un promedio de varias sesiones. Antes de comparar resultados, hay que confirmar que el ping corresponde a una sala alojada en Estados Unidos y repetir la medición varias veces. No usar este único dato para concluir qué región de host es mejor.
+
 ## Plan de pruebas recomendado
 
 ### Fase A — línea base
