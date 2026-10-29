@@ -48,6 +48,21 @@ Para que dos regiones colaboren en una sola simulación, haría falta un protoco
 
 Esta es una primera referencia comunicada por un participante, no una prueba controlada ni un promedio de varias sesiones. Antes de comparar resultados, hay que confirmar que el ping corresponde a una sala alojada en Estados Unidos y repetir la medición varias veces. No usar este único dato para concluir qué región de host es mejor.
 
+
+## Hallazgo práctico: extrapolación y suavizado
+
+La wiki de comandos de HaxBall documenta `/extrapolation <milliseconds>`. La extrapolación intenta contrarrestar el retraso de entrada, pero puede producir más “warping” o saltos visuales; la recomendación documentada es dejarla en 0 salvo que exista retraso de entrada. Fuente: https://github.com/haxball/haxball-issues/wiki/Chat-Commands
+
+También existe un cliente independiente de HaxBall llamado Fut2D (beta para Windows) que ofrece un ajuste de “Prediction smoothing” para suavizar visualmente las correcciones de extrapolación. Su propia web aclara que no reduce el ping ni soluciona problemas de conexión/servidor y que no es un producto oficial de HaxBall: https://haxball.app/?lang=es
+
+### Prueba segura propuesta
+
+1. En la misma sala y durante sesiones comparables, probar primero `/extrapolation 0`.
+2. Si el problema principal es retraso al responder a los controles, probar un valor moderado (por ejemplo 50 ms) y luego 100 ms, anotando sensaciones y saltos. Estos valores son puntos de prueba, no recomendaciones universales.
+3. Volver a 0 si empeora la precisión, aparecen saltos o cuesta leer la pelota.
+4. No cambiar región de host, conexión y extrapolación a la vez. El ping real puede permanecer igual aunque la imagen parezca más fluida.
+5. Solo si se desea y se acepta usar un cliente de terceros, revisar Fut2D desde su web oficial y comparar la misma sala con la misma configuración. Es beta y no oficial; no hace falta instalarlo para la prueba básica con el comando.
+
 ## Plan de pruebas recomendado
 
 ### Fase A — línea base
