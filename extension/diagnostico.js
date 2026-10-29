@@ -58,12 +58,16 @@
     #hgl-diagnostic-panel small{display:block;color:#aab8ce;font-size:10px}
     #hgl-diagnostic-panel b{display:block;font-size:18px;margin-top:2px}
     #hgl-diagnostic-panel .hgl-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+    #hgl-diagnostic-panel.minimized{width:190px;opacity:.72}
+    #hgl-diagnostic-panel.minimized:hover{opacity:1}
     #hgl-diagnostic-panel.minimized #hgl-body{display:none}
     #hgl-diagnostic-panel .hgl-close{display:none}
   `;
   (document.head || document.documentElement).appendChild(style);
   panel.setAttribute("aria-label", "HaxBall Global Lab diagnóstico");
   document.documentElement.appendChild(panel);
+  // Start minimized so the diagnostic panel doesn't cover the pitch.
+  panel.classList.add("minimized");
 
   const byId = id => panel.querySelector("#" + id);
   const inFrame = window !== window.top;
