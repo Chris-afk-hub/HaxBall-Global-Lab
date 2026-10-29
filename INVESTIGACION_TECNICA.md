@@ -1,0 +1,90 @@
+# HaxBall Global Lab — investigación técnica inicial
+
+Actualizado: 29 de octubre de 2026
+
+## Objetivo
+
+Investigar formas realistas de mejorar la experiencia de partidas entre jugadores de Brasil y Estados Unidos, sin prometer eliminar la latencia física. El laboratorio actual registra mediciones manuales; todavía no está conectado a una sala de HaxBall ni recoge ping automáticamente.
+
+## Hallazgos principales
+
+### 1. Cómo funciona la conectividad de HaxBall
+
+La documentación oficial explica que HaxBall usa WebRTC para conectar a los jugadores con el host de la sala. La ubicación del host y las rutas de red influyen en la experiencia. Referencia: https://www.haxball.com/about
+
+El Headless Host oficial permite mantener una sala sin interfaz de juego y controlarla mediante JavaScript. Es útil para automatizar salas y bots, pero no es por sí mismo un sistema que elimine la latencia: https://github.com/haxball/haxball-issues/wiki/Headless-Host
+
+### 2. Qué ofrece node-haxball
+
+Repositorio: https://github.com/wxyz-abcd/node-haxball  
+Documentación: https://github.com/wxyz-abcd/node-haxball/wiki
+
+El proyecto describe una API para desarrollar hosts, clientes y aplicaciones independientes, con soporte para Node.js y navegador. Incluye renderizador personalizable, lectura/escritura de repeticiones y acceso a estados del juego. La versión para navegador depende de un proxy según su README.
+
+Esto lo convierte en una herramienta prometedora para investigación y prototipos. No significa que podamos conectar dos salas oficiales y convertirlas automáticamente en una sola partida coherente.
+
+### 3. Por qué dos hosts regionales no resuelven el problema por sí solos
+
+En una partida compartida, el estado del balón, las colisiones, los goles y las posiciones deben mantenerse coherentes. Si Brasil y Estados Unidos simulan la misma pelota de forma independiente, las diferencias de latencia y el orden de los mensajes pueden producir resultados contradictorios.
+
+Para que dos regiones colaboren en una sola simulación, haría falta un protocolo de sincronización diseñado y probado, además de control del cliente y del código de simulación. Eso es un proyecto de ingeniería importante, no un cambio de configuración.
+
+### 4. Mejoras posibles y sus límites
+
+- **Elegir mejor la región del host:** puede beneficiar a parte de los jugadores, pero no necesariamente a todos.
+- **Medir RTT, variación de latencia (jitter) y pérdida de paquetes:** permite comparar las condiciones de red de forma objetiva.
+- **Predicción local y reconciliación:** puede hacer que el movimiento del propio jugador se sienta más inmediato, pero requiere que cliente y servidor puedan reproducir la misma física y corregir predicciones.
+- **Interpolación/extrapolación visual:** puede suavizar movimientos remotos; no reduce el ping real y puede añadir retraso visual.
+- **Dos hosts regionales sincronizados:** queda como experimento avanzado, después de validar una simulación determinista y un protocolo de autoridad.
+
+## Plan de pruebas recomendado
+
+### Fase A — línea base
+
+1. Conseguir participantes en Brasil y Estados Unidos (idealmente también Argentina).
+2. Probar una sala con host en Brasil y luego otra con host en Estados Unidos.
+3. Hacer pruebas en horarios cercanos y durante 5–10 minutos por sesión.
+4. Anotar para cada jugador: región, host, ping mostrado por HaxBall, conexión (Wi-Fi/Ethernet), hora, tirones y desconexiones.
+5. Repetir cada escenario al menos tres veces. Comparar medianas y no solamente el mejor resultado.
+
+No mezclar el ping del juego con velocidad de descarga: son medidas diferentes. Si se dispone de herramientas de red, registrar además jitter y pérdida de paquetes.
+
+### Fase B — investigar el cliente/host
+
+1. Leer la documentación de node-haxball y sus ejemplos de cliente, host, renderer y estado de juego.
+2. Crear un prototipo aislado, sin afectar salas oficiales ni cuentas de jugadores.
+3. Verificar si se puede observar y reproducir la física de forma determinista.
+4. Solo entonces probar predicción visual en un entorno de laboratorio.
+
+### Fase C — decisión técnica
+
+Comparar tres opciones:
+- Mantener el host en la región que dé mejor resultado global.
+- Probar un cliente experimental con predicción/interpolación.
+- Diseñar un protocolo multirregional propio, solo si las fases anteriores justifican su coste.
+
+## Criterios para considerar que una mejora funciona
+
+- Comparar los mismos escenarios antes y después.
+- Medir mediana y variabilidad del ping, pérdida de paquetes y desconexiones.
+- Evaluar aparte la sensación de movimiento; una animación más suave no demuestra que el ping bajó.
+- Repetir con jugadores reales en ambos países.
+- Documentar fallos y resultados negativos, no solo los casos favorables.
+
+## Estado actual
+
+- [x] HaxBall Global Lab publicado en GitHub Pages.
+- [x] Formulario manual para registrar ping, región y host.
+- [x] Promedios, gráfico, historial y exportación CSV/JSON.
+- [x] Investigación inicial de la arquitectura de HaxBall y node-haxball.
+- [ ] Recolectar mediciones reales en Brasil y Estados Unidos.
+- [ ] Revisar ejemplos concretos de node-haxball y seleccionar un prototipo.
+- [ ] Implementar y probar un experimento de predicción/interpolación.
+
+## Fuentes
+
+- HaxBall — About / tecnología: https://www.haxball.com/about
+- node-haxball — repositorio y README: https://github.com/wxyz-abcd/node-haxball
+- node-haxball — documentación: https://github.com/wxyz-abcd/node-haxball/wiki
+- HaxBall Headless Host — guía de API: https://github.com/haxball/haxball-issues/wiki/Headless-Host
+- Unity Netcode — patrones de latencia, predicción y reconciliación: https://mp-docs.dl.it.unity3d.com/netcode/2.2.0/learn/dealing-with-latency/
