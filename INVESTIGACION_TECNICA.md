@@ -108,6 +108,20 @@ Comparar tres opciones:
 - [ ] Revisar ejemplos concretos de node-haxball y seleccionar un prototipo ejecutable.
 - [ ] Implementar y probar un experimento real de predicción/interpolación en una sala aislada.
 
+## Decisión tras las pruebas iniciales — 29 de octubre de 2026
+
+El usuario informa que su propio jugador se ve fluido, mientras rivales y pelota pegan saltos principalmente en salas con mucho lag. La prueba A/B de `Use low latency canvas` no produjo una diferencia perceptible. El panel mostró 60 FPS, 16,7 ms por frame, 6,9 ms entre una tecla y el siguiente `requestAnimationFrame`, contexto principal y cero canvas detectados. Como el contexto no contiene canvas, estas cifras NO describen de forma fiable el renderizado interno de HaxBall y no deben usarse como resultado del juego.
+
+### Cambio de prioridad
+
+Dejar de invertir tiempo en el panel FPS como vía principal. El síntoma es compatible con jitter/pérdida de paquetes o con la forma en que el cliente oficial interpola/corrige los estados remotos, pero todavía no identifica cuál es la causa. HaxBall documenta que usa WebRTC entre jugadores y host (https://www.haxball.com/about).
+
+### Límite actual y siguiente experimento
+
+Una extensión que solo añade un panel no puede suavizar la pelota ni los rivales: necesita acceso a los estados remotos y al código de representación del juego. No hay evidencia todavía de que el cliente oficial exponga una API pública para modificar esa interpolación. No prometer un parche visual hasta demostrar un punto de integración.
+
+Próximo paso con resultado medible: en una sesión con saltos, recopilar estadísticas WebRTC del navegador (RTT, jitter y paquetes perdidos cuando estén disponibles) y comparar con una sesión fluida. Si las métricas de red se degradan a la vez, priorizar red/ruta/host; si permanecen estables, investigar el cliente y sus correcciones visuales. No confundir una simulación o un overlay con una mejora real de HaxBall.
+
 ## Fuentes
 
 - HaxBall — About / tecnología: https://www.haxball.com/about
