@@ -29,6 +29,8 @@
         <div><small>FPS aprox.</small><b id="hgl-fps">—</b></div>
         <div><small>Frame medio</small><b id="hgl-frame">—</b></div>
         <div><small>Tecla → siguiente frame</small><b id="hgl-key">—</b></div>
+        <div><small>Contexto</small><b id="hgl-context">Detectando</b></div>
+        <div><small>Canvas en este documento</small><b id="hgl-canvas">Detectando</b></div>
         <div><small>Estado</small><b id="hgl-state">Midiendo</b></div>
       </div>
       <p class="hgl-note">La medida de teclado es solo un indicador local; no es el ping ni mide cuándo llega la acción al host.</p>
@@ -64,7 +66,16 @@
   document.documentElement.appendChild(panel);
 
   const byId = id => panel.querySelector("#" + id);
+  const inFrame = window !== window.top;
+  const canvasCount = document.querySelectorAll("canvas").length;
+  const updateContext = () => {
+    byId("hgl-context").textContent = inFrame ? "Iframe" : "Principal";
+    byId("hgl-canvas").textContent = String(document.querySelectorAll("canvas").length);
+  };
+  updateContext();
+
   const update = () => {
+    updateContext();
     byId("hgl-fps").textContent = fps ? String(fps) : "—";
     byId("hgl-frame").textContent = frameMs ? frameMs.toFixed(1) + " ms" : "—";
     const recentKeys = keySamples.slice(-30);
@@ -114,7 +125,9 @@
       fps: fps || "",
       average_frame_ms: frameMs ? Number(frameMs.toFixed(2)) : "",
       key_to_next_frame_ms: lastKeyMs == null ? "" : Number(lastKeyMs.toFixed(2)),
-      note: "Marca manual; no representa ping de red"
+      document_context: inFrame ? "iframe" : "principal",
+      canvas_count_in_document: document.querySelectorAll("canvas").length,
+      note: "Marca manual; FPS y canvas pertenecen al documento de esta extensión; no representan ping de red"
     };
     samples.push(record);
     byId("hgl-last").textContent = "Marca guardada: " + new Date(record.time).toLocaleTimeString();
@@ -122,8 +135,8 @@
   });
   byId("hgl-export").addEventListener("click", () => {
     const rows = [
-      ["time","fps","average_frame_ms","key_to_next_frame_ms","note"],
-      ...samples.map(s => [s.time,s.fps,s.average_frame_ms,s.key_to_next_frame_ms,s.note])
+      ["time","fps","average_frame_ms","key_to_next_frame_ms","document_context","canvas_count_in_document","note"],
+      ...samples.map(s => [s.time,s.fps,s.average_frame_ms,s.key_to_next_frame_ms,s.document_context,s.canvas_count_in_document,s.note])
     ];
     const csv = rows.map(row => row.map(value => '"' + String(value).replace(/"/g, '""') + '"').join(",")).join("\r\n");
     const url = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));
