@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HaxBall Global Lab — Prototipo de latencia</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#131b30;--line:#283651;--text:#eef3ff;--muted:#a7b4cc;--accent:#7dd3fc;--good:#86efac;--warn:#fcd34d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#172747,var(--bg) 65%);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1000px;margin:auto;padding:24px 16px 48px}a{color:var(--accent)}h1{line-height:1.15;font-size:clamp(1.8rem,5vw,3rem);margin:.4rem 0}h2{font-size:1.15rem}.muted{color:var(--muted)}.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--accent);font-size:.85rem}.panel{background:rgba(19,27,48,.94);border:1px solid var(--line);border-radius:16px;padding:18px;margin:16px 0}.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}.control{display:grid;gap:7px}input[type=range]{width:100%;accent-color:var(--accent)}button{background:var(--accent);color:#061321;border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}button.secondary{background:#24324b;color:var(--text);border:1px solid var(--line)}.arena{position:relative;height:250px;background:linear-gradient(90deg,#155e45,#166534);border:3px solid #cdebd7;border-radius:12px;overflow:hidden}.mid{position:absolute;left:50%;top:0;bottom:0;border-left:2px solid #cdebd7aa}.circle{position:absolute;width:110px;height:110px;border:2px solid #cdebd7aa;border-radius:50%;left:calc(50% - 55px);top:calc(50% - 55px)}.ball{position:absolute;top:calc(50% - 9px);width:18px;height:18px;border-radius:50%;background:white;box-shadow:0 0 10px #fff8;transform:translateX(-50%)}.ghost{background:#fcd34d;opacity:.7;outline:2px dashed #fff}.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}.metric{background:#0b1222;border:1px solid var(--line);border-radius:12px;padding:12px}.metric strong{display:block;font-size:1.4rem}.small{font-size:.9rem}.status{color:var(--good)}footer{margin-top:24px;color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body><main>
+<a href="../../index.html">← Volver a HaxBall Global Lab</a>
+<p><span class="tag">PROTOTIPO 01 · SIMULACIÓN LOCAL</span></p>
+<h1>Laboratorio de latencia</h1>
+<p class="muted">Primera prueba visual para entender qué puede y qué no puede hacer la predicción local. No se conecta a HaxBall ni cambia tu ping real.</p>
+<section class="panel">
+<h2>Configurá el escenario</h2>
+<div class="controls">
+<label class="control">Latencia simulada (ida y vuelta aproximada): <strong><span id="latencyValue">205</span> ms</strong><input id="latency" type="range" min="20" max="300" step="5" value="205"></label>
+<label class="control">Velocidad de movimiento: <strong><span id="speedValue">180</span> px/s</strong><input id="speed" type="range" min="60" max="360" step="10" value="180"></label>
+<label class="control">Suavizado visual remoto: <strong><span id="smoothValue">50</span>%</strong><input id="smooth" type="range" min="0" max="100" step="10" value="50"></label>
+</div>
+<p class="small muted">Amarillo = posición estimada localmente. Blanco = estado remoto simulado con demora. Mové el control para comparar.</p>
+<div class="arena" id="arena" aria-label="Campo de prueba"><div class="mid"></div><div class="circle"></div><div class="ball ghost" id="predicted"></div><div class="ball" id="remote"></div></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button id="move">Mover jugador</button><button id="reset" class="secondary">Reiniciar</button><button id="toggle" class="secondary">Pausar simulación</button></div>
+</section>
+<section class="panel"><h2>Lectura de esta prueba</h2><div class="metrics">
+<div class="metric"><span class="muted small">Latencia simulada</span><strong id="mLatency">205 ms</strong></div>
+<div class="metric"><span class="muted small">Demora visual simulada</span><strong id="mDelay">103 ms</strong></div>
+<div class="metric"><span class="muted small">Predicción local</span><strong class="status">Activa</strong></div>
+</div>
+<p id="explanation" class="small">La predicción mueve la representación local de inmediato, mientras que el estado remoto llega más tarde. Esto es una demostración conceptual, no una medición de red.</p></section>
+<section class="panel"><h2>Qué falta para un prototipo real</h2>
+<ol><li>Validar cómo se puede leer y simular el estado de una partida con <code>node-haxball</code>.</li><li>Crear una sala de prueba separada y medir ping real desde Argentina.</li><li>Probar predicción/reconciliación solo si el cliente puede reproducir la misma física que el host.</li><li>Comparar la sensación de movimiento sin esconder errores de colisión, goles o posición.</li></ol>
+<p><strong>Importante:</strong> la página no reduce el ping de HaxBall. Sirve para explorar el concepto antes de intentar una integración real, que requiere un host Node.js y pruebas con jugadores.</p></section>
+<footer>HaxBall Global Lab · Prototipo experimental · Sin conexión con salas oficiales ni recolección de datos.</footer>
+</main>
+<script>
+const latency=document.querySelector('#latency'),speed=document.querySelector('#speed'),smooth=document.querySelector('#smooth');
+const latencyValue=document.querySelector('#latencyValue'),speedValue=document.querySelector('#speedValue'),smoothValue=document.querySelector('#smoothValue'),mLatency=document.querySelector('#mLatency'),mDelay=document.querySelector('#mDelay'),explanation=document.querySelector('#explanation');
+const predicted=document.querySelector('#predicted'),remote=document.querySelector('#remote'),arena=document.querySelector('#arena');
+let x=50,dir=1,running=true,last=performance.now(),remoteX=50,queue=[],moveBoost=0;
+function updateLabels(){latencyValue.textContent=latency.value;speedValue.textContent=speed.value;smoothValue.textContent=smooth.value;mLatency.textContent=latency.value+' ms';mDelay.textContent=Math.round(latency.value*Number(smooth.value)/100)+' ms';explanation.textContent='La posición amarilla representa una estimación inmediata. La blanca representa un estado retrasado y suavizado. En un juego real, predecir mal puede causar correcciones bruscas; suavizar puede ocultar tirones, pero también agrega retraso visual.'}
+[latency,speed,smooth].forEach(el=>el.addEventListener('input',updateLabels));
+function animate(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){x+=dir*(Number(speed.value)/500)*dt*60;if(x>94){x=94;dir=-1}else if(x<6){x=6;dir=1}queue.push({t:now,x});const targetTime=now-Number(latency.value);while(queue.length>1&&queue[1].t<targetTime)queue.shift();if(queue.length){const target=queue[0].x;const k=Number(smooth.value)/100;remoteX+=(target-remoteX)*(k===0?1:Math.min(1,dt*(2+k*18)));}}predicted.style.left=x+'%';remote.style.left=remoteX+'%';requestAnimationFrame(animate)}
+document.querySelector('#move').addEventListener('click',()=>{dir*=-1;x=Math.max(6,Math.min(94,x+dir*8));queue.push({t:performance.now(),x})});
+document.querySelector('#reset').addEventListener('click',()=>{x=50;remoteX=50;dir=1;queue=[];last=performance.now()});
+document.querySelector('#toggle').addEventListener('click',e=>{running=!running;e.currentTarget.textContent=running?'Pausar simulación':'Reanudar simulación';last=performance.now()});
+updateLabels();requestAnimationFrame(animate);
+</script></body></html>
