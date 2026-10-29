@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "HaxBall Global Lab — Diagnóstico",
+  "version": "0.1.0",
+  "description": "Mide fluidez de pantalla y respuesta local de teclado en HaxBall sin alterar la partida.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.haxball.com/*",
+        "https://haxball.com/*",
+        "https://www.haxball.io/*",
+        "https://haxball.io/*"
+      ],
+      "js": ["diagnostico.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}
