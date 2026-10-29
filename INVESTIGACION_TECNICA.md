@@ -115,3 +115,26 @@ Comparar tres opciones:
 - node-haxball — documentación: https://github.com/wxyz-abcd/node-haxball/wiki
 - HaxBall Headless Host — guía de API: https://github.com/haxball/haxball-issues/wiki/Headless-Host
 - Unity Netcode — patrones de latencia, predicción y reconciliación: https://mp-docs.dl.it.unity3d.com/netcode/2.2.0/learn/dealing-with-latency/
+
+## Siguiente fase: diagnóstico en el cliente oficial
+
+### Mejora oficial de latencia de entrada
+
+El blog oficial de HaxBall publicó el 1 de mayo de 2023 una mejora de input lag. En Chromium (incluido Chrome) HaxBall usa una función de canvas desincronizado para reducir la latencia de renderizado, habilitada por defecto en esa publicación; existe una opción de vídeo llamada `Use low latency canvas` para desactivarla. También se modificó el procesamiento de entrada para responder directamente al evento HTML de teclado. Fuente: https://blog.haxball.com/
+
+**Prueba recomendada:** en el cliente oficial, abrir los ajustes de vídeo y verificar que `Use low latency canvas` esté activado si la opción aparece. No cambiar otras opciones durante la primera comparación.
+
+### Qué mide la extensión actual
+
+La extensión `extension/` recoge FPS aproximados y tiempo entre fotogramas en el contexto donde se inyecta. Su medición de tecla al siguiente `requestAnimationFrame` es únicamente un indicador local, no mide cuándo llega la acción al host ni la latencia de red. Si el juego corre dentro de un iframe aislado, las métricas pueden corresponder al documento contenedor y no al canvas del juego. Hay que validar ese detalle antes de interpretar los resultados.
+
+### Vía técnica para acceder al estado de juego
+
+La investigación de `node-haxball` confirma que esa biblioteca de terceros implementa clientes/hosts y expone estado de sala y estado de juego a través de su propia API. Esto abre una vía para estudiar predicción y reconciliación en un cliente compatible, pero no demuestra que una extensión pueda leer o modificar el estado interno del cliente oficial. Fuente: https://github.com/wxyz-abcd/node-haxball
+
+**Decisión de ingeniería:** no inyectar una segunda simulación ni alterar mensajes del cliente oficial hasta confirmar que existe un punto de integración seguro. Próximas etapas:
+1. Validar la opción oficial de baja latencia y registrar una línea base estable.
+2. Verificar si la extensión puede observar el documento/iframe del juego, sin interferir con el control.
+3. Si el cliente oficial no expone su estado, crear un prototipo de predicción usando la API de un cliente compatible y comparar su comportamiento; no presentarlo como un parche del cliente oficial.
+4. Solo plantear rollback si se puede reproducir la física y reconciliar el estado autoritativo. Una extensión que solo dibuja un overlay no puede conseguirlo.
+
