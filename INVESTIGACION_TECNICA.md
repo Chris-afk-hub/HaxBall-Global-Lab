@@ -124,6 +124,12 @@ El blog oficial de HaxBall publicó el 1 de mayo de 2023 una mejora de input lag
 
 **Prueba recomendada:** en el cliente oficial, abrir los ajustes de vídeo y verificar que `Use low latency canvas` esté activado si la opción aparece. No cambiar otras opciones durante la primera comparación.
 
+### Resultado de la primera prueba de baja latencia — 29 de octubre de 2026
+
+El usuario confirmó que la opción `Use low latency canvas` aparece en los ajustes. En una comparación subjetiva no notó diferencias con el ajuste activado/desactivado. Ping informado durante la prueba: 150–220 ms. Esto no demuestra que la opción no sirva; indica que, en esa prueba, no se percibió una mejora clara. No se deben sacar conclusiones de una única comparación.
+
+Siguiente experimento: verificar en qué documento se ejecuta la extensión y si ese documento contiene elementos `canvas`. Se añadió al panel el indicador `Contexto` (documento principal o iframe) y `Canvas en este documento` (cantidad de canvas detectados); ambos datos también se incluyen en el CSV. Son indicadores de estructura del navegador, no una identificación garantizada del canvas de juego ni una medición de latencia.
+
 ### Qué mide la extensión actual
 
 La extensión `extension/` recoge FPS aproximados y tiempo entre fotogramas en el contexto donde se inyecta. Su medición de tecla al siguiente `requestAnimationFrame` es únicamente un indicador local, no mide cuándo llega la acción al host ni la latencia de red. Si el juego corre dentro de un iframe aislado, las métricas pueden corresponder al documento contenedor y no al canvas del juego. Hay que validar ese detalle antes de interpretar los resultados.
